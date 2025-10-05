@@ -28,10 +28,10 @@ const Index = () => {
           </p>
           <div className="flex gap-4 justify-center">
             <Button asChild size="lg" className="gradient-primary text-lg px-8 py-6">
-              <Link to="/auth">Get Started</Link>
+              <Link to="/auth?mode=signup">Get Started</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 bg-white/10 backdrop-blur-sm text-white border-white/30 hover:bg-white/20">
-              <Link to="/auth">Learn More</Link>
+              <Link to="/auth?mode=signup">Learn More</Link>
             </Button>
           </div>
         </div>
@@ -107,7 +107,7 @@ const Index = () => {
             Join thousands of players who are already using SpinSync to improve their game
           </p>
           <Button asChild size="lg" className="gradient-primary text-lg px-8 py-6">
-            <Link to="/auth">Sign Up Now</Link>
+            <Link to="/auth?mode=signup">Sign Up Now</Link>
           </Button>
         </div>
       </section>

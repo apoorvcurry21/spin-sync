@@ -11,7 +11,15 @@ import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const getInitialIsLogin = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('mode') !== 'signup';
+  };
+  const [isLogin, setIsLogin] = useState(getInitialIsLogin);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setIsLogin(params.get('mode') !== 'signup');
+  }, [window.location.search]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -68,7 +76,7 @@ const Auth = () => {
         });
         navigate("/dashboard");
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error",
         description: error.message,

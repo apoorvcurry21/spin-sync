@@ -44,10 +44,10 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
           </Link>
           <div className="flex gap-2">
             <Button asChild variant="outline">
-              <Link to="/auth">Log In</Link>
+              <Link to="/auth?mode=login">Log In</Link>
             </Button>
             <Button asChild className="gradient-primary">
-              <Link to="/auth">Sign Up</Link>
+              <Link to="/auth?mode=signup">Sign Up</Link>
             </Button>
           </div>
         </div>
