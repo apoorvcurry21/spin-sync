@@ -32,7 +32,7 @@ const Messaging = () => {
         const { data, error } = await supabase
           .from('messages')
           .select('*')
-          .or(`(sender_id.eq.${user.id},receiver_id.eq.${selectedConnection.connected_user.id}),(sender_id.eq.${selectedConnection.connected_user.id},receiver_id.eq.${user.id})`)
+          .or(`and(sender_id.eq.${user.id},receiver_id.eq.${selectedConnection.connected_user.id}),and(sender_id.eq.${selectedConnection.connected_user.id},receiver_id.eq.${user.id})`)
           .order('created_at', { ascending: true });
         if (error) {
           console.error('Error fetching messages:', error);
