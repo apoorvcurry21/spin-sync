@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import FindPlayers from "./pages/FindPlayers";
 import FindTables from "./pages/FindTables";
 import Profile from "./pages/Profile";
+import Messaging from "./pages/Messaging";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/find-players" element={<FindPlayers />} />
           <Route path="/find-tables" element={<FindTables />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/messaging" element={<Messaging />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

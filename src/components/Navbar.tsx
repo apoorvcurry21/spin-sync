@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Users, MapPin, User, LogOut } from "lucide-react";
+import { Home, Users, MapPin, User, LogOut, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -105,6 +105,17 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
             <Link to="/profile">
               <User className="h-4 w-4 mr-2" />
               Profile
+            </Link>
+          </Button>
+
+          <Button
+            variant={isActive("/messaging") ? "secondary" : "ghost"}
+            size="sm"
+            asChild
+          >
+            <Link to="/messaging">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Messages
             </Link>
           </Button>
           
