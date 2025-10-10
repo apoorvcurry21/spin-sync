@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, MapPin, Bell, TrendingUp } from "lucide-react";
+import { Users, MapPin, Bell, TrendingUp, MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 
@@ -25,6 +26,8 @@ const Dashboard = () => {
   const [profile, setProfile] = useState<any>(null);
   const [requests, setRequests] = useState<ConnectionRequest[]>([]);
   const [stats, setStats] = useState({ connections: 0, requests: 0 });
+  const unreadMessagesStatus = useUnreadMessages();
+  const unreadMessages = Object.values(unreadMessagesStatus).filter(Boolean).length;
 
   useEffect(() => {
     if (!loading && !user) {
@@ -234,6 +237,17 @@ const Dashboard = () => {
               >
                 <MapPin className="mr-2 h-4 w-4" />
                 Discover Tables
+              </Button>
+              <Button
+                className="w-full justify-start"
+                variant="outline"
+                onClick={() => navigate("/messaging")}
+              >
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Messages
+                {unreadMessages > 0 && (
+                  <Badge className="ml-auto">{unreadMessages}</Badge>
+                )}
               </Button>
               <Button
                 className="w-full justify-start gradient-primary"
