@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MapPin, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
+import { AddTableForm } from "@/components/AddTableForm";
 
 interface Table {
   id: string;
@@ -21,6 +23,7 @@ const FindTables = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [tables, setTables] = useState<Table[]>([]);
+  const [isAddTableOpen, setIsAddTableOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -43,6 +46,11 @@ const FindTables = () => {
     if (data) {
       setTables(data);
     }
+  };
+
+  const handleAddTableSuccess = () => {
+    setIsAddTableOpen(false);
+    loadTables();
   };
 
   if (loading) {
@@ -71,10 +79,20 @@ const FindTables = () => {
               Discover ping pong tables near you
             </p>
           </div>
-          <Button className="gradient-primary">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Table
-          </Button>
+          <Dialog open={isAddTableOpen} onOpenChange={setIsAddTableOpen}>
+            <DialogTrigger asChild>
+              <Button className="gradient-primary">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Table
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add a new table</DialogTitle>
+              </DialogHeader>
+              <AddTableForm onSuccess={handleAddTableSuccess} />
+            </DialogContent>
+          </Dialog>
         </div>
 
         <Card className="mb-8">
