@@ -43,10 +43,10 @@ const Messaging = () => {
       fetchMessages();
 
       const subscription = supabase
-        .channel(`messages:sender_id-${user.id}-receiver_id-${selectedConnection.connected_user.id}`)
+        .channel('messages')
         .on(
           'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'messages' },
+          { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${user.id}` },
           (payload) => {
             setMessages((prevMessages) => [...prevMessages, payload.new]);
           }
@@ -63,17 +63,20 @@ const Messaging = () => {
     e.preventDefault();
     if (newMessage.trim() === '' || !selectedConnection) return;
 
-    const { error } = await supabase.from('messages').insert([
+    const { data, error } = await supabase.from('messages').insert([
       {
         sender_id: user.id,
         receiver_id: selectedConnection.connected_user.id,
         content: newMessage,
       },
-    ]);
+    ]).select();
 
     if (error) {
       console.error('Error sending message:', error);
     } else {
+      if (data) {
+        setMessages((prevMessages) => [...prevMessages, data[0]]);
+      }
       setNewMessage('');
     }
   };
