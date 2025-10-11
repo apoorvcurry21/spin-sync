@@ -1,4 +1,7 @@
+-- ========================
 -- Create profiles table
+-- ========================
+
 CREATE TABLE public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
@@ -10,7 +13,10 @@ CREATE TABLE public.profiles (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- ========================
 -- Create tables for table tennis locations
+-- ========================
+
 CREATE TABLE public.ping_pong_tables (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
@@ -23,7 +29,10 @@ CREATE TABLE public.ping_pong_tables (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- ========================
 -- Create connection requests table
+-- ========================
+
 CREATE TABLE public.connection_requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   sender_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -35,7 +44,10 @@ CREATE TABLE public.connection_requests (
   UNIQUE(sender_id, receiver_id)
 );
 
+-- ========================
 -- Create connections table (for accepted connections)
+-- ========================
+
 CREATE TABLE public.connections (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -44,13 +56,19 @@ CREATE TABLE public.connections (
   UNIQUE(user_id, connected_user_id)
 );
 
+-- ========================
 -- Enable RLS
+-- ========================
+
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ping_pong_tables ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.connection_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.connections ENABLE ROW LEVEL SECURITY;
 
+-- ========================
 -- RLS Policies for profiles
+-- ========================
+
 CREATE POLICY "Profiles are viewable by everyone"
   ON public.profiles FOR SELECT
   USING (true);
@@ -63,7 +81,10 @@ CREATE POLICY "Users can insert their own profile"
   ON public.profiles FOR INSERT
   WITH CHECK (auth.uid() = id);
 
+-- ========================
 -- RLS Policies for ping_pong_tables
+-- ========================
+
 CREATE POLICY "Tables are viewable by everyone"
   ON public.ping_pong_tables FOR SELECT
   USING (true);
@@ -72,7 +93,10 @@ CREATE POLICY "Authenticated users can create tables"
   ON public.ping_pong_tables FOR INSERT
   WITH CHECK (auth.uid() IS NOT NULL);
 
+-- ========================
 -- RLS Policies for connection_requests
+-- ========================
+
 CREATE POLICY "Users can view their own requests"
   ON public.connection_requests FOR SELECT
   USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
@@ -85,7 +109,10 @@ CREATE POLICY "Users can update requests they received"
   ON public.connection_requests FOR UPDATE
   USING (auth.uid() = receiver_id);
 
+-- ========================
 -- RLS Policies for connections
+-- ========================
+
 CREATE POLICY "Users can view their own connections"
   ON public.connections FOR SELECT
   USING (auth.uid() = user_id OR auth.uid() = connected_user_id);
@@ -94,7 +121,10 @@ CREATE POLICY "System can create connections"
   ON public.connections FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+-- ========================
 -- Function to update updated_at timestamp
+-- ========================
+
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -103,7 +133,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- ========================
 -- Triggers for updated_at
+-- ========================
+
 CREATE TRIGGER update_profiles_updated_at
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW
@@ -114,7 +147,10 @@ CREATE TRIGGER update_connection_requests_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION public.update_updated_at_column();
 
+-- ========================
 -- Function to handle new user signup
+-- ========================
+
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -129,13 +165,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger for new user
+-- ========================
+-- Trigger for new user (Safe re-creation)
+-- ========================
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_new_user();
 
+-- ========================
 -- Function to create mutual connections when request is accepted
+-- ========================
+
 CREATE OR REPLACE FUNCTION public.handle_accepted_connection()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -154,8 +198,33 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- ========================
 -- Trigger for accepted connections
+-- ========================
+
 CREATE TRIGGER on_connection_accepted
   AFTER UPDATE ON public.connection_requests
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_accepted_connection();
+
+-- ========================
+-- Messaging System
+-- ========================
+
+CREATE TABLE public.messages (
+  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  sender_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  receiver_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own messages"
+  ON public.messages FOR SELECT
+  USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
+
+CREATE POLICY "Users can insert their own messages"
+  ON public.messages FOR INSERT
+  WITH CHECK (auth.uid() = sender_id);

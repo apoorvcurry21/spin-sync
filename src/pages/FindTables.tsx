@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { MapPin, Plus } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { MapPin, Plus, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
@@ -17,6 +18,7 @@ interface Table {
   latitude: number;
   longitude: number;
   description: string | null;
+  created_by: string;
 }
 
 const FindTables = () => {
@@ -24,6 +26,9 @@ const FindTables = () => {
   const navigate = useNavigate();
   const [tables, setTables] = useState<Table[]>([]);
   const [isAddTableOpen, setIsAddTableOpen] = useState(false);
+  const [isEditTableOpen, setIsEditTableOpen] = useState(false);
+  const [selectedTable, setSelectedTable] = useState<Table | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -51,6 +56,39 @@ const FindTables = () => {
   const handleAddTableSuccess = () => {
     setIsAddTableOpen(false);
     loadTables();
+  };
+
+  const handleEditTableSuccess = () => {
+    setIsEditTableOpen(false);
+    setSelectedTable(null);
+    loadTables();
+  };
+
+  const openEditDialog = (table: Table) => {
+    setSelectedTable(table);
+    setIsEditTableOpen(true);
+  };
+
+  const openDeleteDialog = (table: Table) => {
+    setSelectedTable(table);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedTable) return;
+
+    const { error } = await supabase
+      .from("ping_pong_tables")
+      .delete()
+      .match({ id: selectedTable.id });
+
+    if (error) {
+      console.error("Error deleting table:", error);
+    } else {
+      loadTables();
+    }
+    setIsDeleteDialogOpen(false);
+    setSelectedTable(null);
   };
 
   if (loading) {
@@ -122,9 +160,21 @@ const FindTables = () => {
             {tables.map((table) => (
               <Card key={table.id} className="card-hover">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-primary" />
-                    {table.name}
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-5 w-5 text-primary" />
+                      {table.name}
+                    </div>
+                    {user && user.id === table.created_by && (
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(table)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => openDeleteDialog(table)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
@@ -152,6 +202,38 @@ const FindTables = () => {
           )}
         </div>
       </div>
+
+      {/* Edit Table Dialog */}
+      <Dialog open={isEditTableOpen} onOpenChange={setIsEditTableOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Table</DialogTitle>
+          </DialogHeader>
+          {selectedTable && (
+            <AddTableForm
+              onSuccess={handleEditTableSuccess}
+              tableToEdit={selectedTable}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the table
+              and remove its data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

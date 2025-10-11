@@ -24,7 +24,7 @@ export const useUnreadMessages = () => {
           const { data: lastMessage, error: lastMessageError } = await supabase
             .from('messages')
             .select('created_at')
-            .or(`(sender_id.eq.${user.id},receiver_id.eq.${connection.connected_user_id}),(sender_id.eq.${connection.connected_user_id},receiver_id.eq.${user.id})`)
+            .or(`and(sender_id.eq.${user.id},receiver_id.eq.${connection.connected_user_id}),and(sender_id.eq.${connection.connected_user_id},receiver_id.eq.${user.id})`)
             .order('created_at', { ascending: false })
             .limit(1)
             .single();
