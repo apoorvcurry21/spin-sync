@@ -1,10 +1,10 @@
 # SpinSync 
 
-Ever have that itch to play some table tennis but can't find a partner or an open table? We've got you covered.
+Ever have that itch to play some table tennis but can't find a partner or an open table? I've got you covered.
 
 ## What's this all about?
 
-SpinSync is a web app designed to connect table tennis enthusiasts. Whether you're looking for a casual match, a competitive game, or just an available table, our goal is to make it happen. Find players, find tables, and get your game on.
+SpinSync is a web app designed to connect table tennis enthusiasts. Whether you're looking for a casual match, a competitive game, or just an available table, my goal is to make it happen. Find players, find tables, and get your game on.
 
 ## Features
 
@@ -35,7 +35,7 @@ cd spin-sync
 
 ### 2. Install Dependencies
 
-We use Bun for package management. If you don't have it, you'll need to [install it first](https://bun.sh/docs/installation).
+I use Bun for package management. If you don't have it, you'll need to [install it first](https://bun.sh/docs/installation).
 
 Once you have Bun, install the project dependencies:
 
