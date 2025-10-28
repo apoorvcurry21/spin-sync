@@ -55,11 +55,16 @@ const Auth = () => {
         });
         navigate("/dashboard");
       } else {
-        const { error } = await supabase.auth.signUp({
+        const redirectUrl =
+          import.meta.env.MODE === "development"
+            ? "http://localhost:5173/"
+            : "https://spin-sync-navy.vercel.app/";
+
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: redirectUrl,
             data: {
               name,
               city,
