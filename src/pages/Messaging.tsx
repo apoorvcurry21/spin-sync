@@ -97,18 +97,18 @@ const Messaging = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="w-1/3 border-r border-gray-200 bg-white shadow-md">
-        <h2 className="text-xl font-semibold p-4 border-b border-gray-200">Connections</h2>
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="w-1/3 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md">
+        <h2 className="text-xl font-semibold p-4 border-b border-gray-200 dark:border-gray-700 dark:text-gray-100">Connections</h2>
         <ul>
           {connections.map((connection) => (
             <li
               key={connection.id}
-              className={`p-4 cursor-pointer hover:bg-gray-50 ${selectedConnection?.id === connection.id ? 'bg-gray-200' : ''}`}
+              className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${selectedConnection?.id === connection.id ? 'bg-gray-200 dark:bg-gray-600' : ''}`}
               onClick={() => setSelectedConnection(connection)}
             >
               <div className="flex items-center justify-between">
-                <span>{connection.connected_user.name}</span>
+                <span className="dark:text-gray-100">{connection.connected_user.name}</span>
                 {unreadStatus[connection.id] && <Badge>New</Badge>}
               </div>
             </li>
@@ -118,32 +118,32 @@ const Messaging = () => {
       <div className="w-2/3 flex flex-col">
         {selectedConnection ? (
           <>
-            <div className="p-4 border-b border-gray-200 bg-white">
-              <h2 className="text-xl font-semibold">{selectedConnection.connected_user.name}</h2>
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <h2 className="text-xl font-semibold dark:text-gray-100">{selectedConnection.connected_user.name}</h2>
             </div>
-            <div className="flex-1 p-4 overflow-y-auto bg-cover bg-center" style={{backgroundImage: "url('/src/assets/hero-bg.jpg')"}}>
+            <div className="flex-1 p-4 overflow-y-auto bg-cover bg-center dark:bg-gray-900" style={{backgroundImage: "url('/src/assets/hero-bg.jpg')"}}>
               {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex my-2 ${message.sender_id === user.id ? 'justify-end' : 'justify-start'}`}>
                   <div
-                    className={`p-3 rounded-2xl max-w-md shadow ${message.sender_id === user.id ? 'bg-blue-500 text-white rounded-br-none' : 'bg-white text-gray-800 rounded-bl-none'}`}>
+                    className={`p-3 rounded-2xl max-w-md shadow ${message.sender_id === user.id ? 'bg-blue-500 text-white rounded-br-none' : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-bl-none'}`}>
                     {message.content}
                   </div>
                 </div>
               ))}
               <div ref={messagesEndRef} />
             </div>
-            <div className="p-4 border-t border-gray-200 bg-white">
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               <form onSubmit={handleSendMessage} className="flex">
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  className="flex-1 border-2 border-gray-300 rounded-full py-3 px-5 focus:outline-none focus:border-blue-500"
+                  className="flex-1 border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-full py-3 px-5 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 dark:placeholder-gray-400"
                   placeholder="Type a message..."
                 />
-                <button type="submit" className="ml-4 bg-blue-500 text-white rounded-full p-3 hover:bg-blue-600 focus:outline-none">
+                <button type="submit" className="ml-4 bg-blue-500 text-white rounded-full p-3 hover:bg-blue-600 dark:hover:bg-blue-400 focus:outline-none">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
