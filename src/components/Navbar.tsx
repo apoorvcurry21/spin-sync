@@ -1,9 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Users, MapPin, User, LogOut, MessageSquare } from "lucide-react";
+import { Home, Users, MapPin, User, LogOut, MessageSquare, Sun, Moon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "@/hooks/useTheme";
 import logo from "@/assets/logo.png";
 
 interface NavbarProps {
@@ -14,6 +15,7 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -42,7 +44,19 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
             <img src={logo} alt="SpinSync" className="h-10 w-10" />
             <span className="text-2xl font-bold text-gradient">SpinSync</span>
           </Link>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="mr-2"
+            >
+              {theme === 'light' ? (
+                <Moon className="h-[1.2rem] w-[1.2rem]" />
+              ) : (
+                <Sun className="h-[1.2rem] w-[1.2rem]" />
+              )}
+            </Button>
             <Button asChild variant="outline">
               <Link to="/auth?mode=login">Log In</Link>
             </Button>
@@ -126,6 +140,19 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
           >
             <LogOut className="h-4 w-4 mr-2" />
             Logout
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="ml-2"
+          >
+            {theme === 'light' ? (
+              <Moon className="h-[1.2rem] w-[1.2rem]" />
+            ) : (
+              <Sun className="h-[1.2rem] w-[1.2rem]" />
+            )}
           </Button>
         </div>
       </div>
